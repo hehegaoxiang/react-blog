@@ -1,0 +1,9 @@
+.bread-div a,
+.detailed-bread-div a {
+  color: #fe346e;
+  font-size: 1.3rem;
+  font-weight: 300;
+}
+.bread-div {
+  padding-left: 0.6rem;
+}
