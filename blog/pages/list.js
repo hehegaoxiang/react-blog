@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Head from "next/head";
 import { Row, Col, List, Breadcrumb } from "antd";
 import {
@@ -11,34 +11,31 @@ import Author from "../components/Author";
 import Advert from "../components/Advert";
 import Footer from "../components/Footer";
 import "../public/style/pages/list.css";
+import axios from "axios";
+import servicePath from "../config/apiUrl";
+import Link from "next/link";
+import marked from "marked";
+import hljs from "highlight.js";
+import "highlight.js/styles/monokai-sublime.css";
 
-const MyList = () => {
-  const [mylist, setMylist] = useState([
-    {
-      title: "50元加入小密圈 胖哥带你学一年",
-      context: "50元跟着胖哥学一年，掌握程序人的学习方法。",
+const MyList = (list) => {
+  const [mylist, setMylist] = useState(list.data);
+  const renderer = new marked.Renderer();
+  marked.setOptions({
+    renderer: renderer,
+    gfm: true,
+    pedantic: false, // 容错检验
+    sanitize: false, //忽略HTMl标签
+    tables: true,
+    breaks: false,
+    smartLists: true,
+    highlight: function (code) {
+      return hljs.highlightAuto(code).value;
     },
-    {
-      title: "React实战视频教程-技术胖Blog开发(更新04集)",
-      context: "50元跟着胖哥学一年，掌握程序人的学习方法。",
-    },
-    {
-      title: "React服务端渲染框架Next.js入门(共12集)",
-      context: "50元跟着胖哥学一年，掌握程序人的学习方法。",
-    },
-    {
-      title: "React Hooks 免费视频教程(共11集)",
-      context: "50元跟着胖哥学一年，掌握程序人的学习方法。",
-    },
-    {
-      title: "React Hooks 免费视频教程(共11集)",
-      context: "50元跟着胖哥学一年，掌握程序人的学习方法。",
-    },
-    {
-      title: "React Hooks 免费视频教程(共11集)",
-      context: "50元跟着胖哥学一年，掌握程序人的学习方法。",
-    },
-  ]);
+  });
+  useEffect(() => {
+    setMylist(list.data);
+  });
   return (
     <div>
       <Head>
@@ -54,7 +51,13 @@ const MyList = () => {
                   <Breadcrumb.Item>
                     <a href="/">首页</a>
                   </Breadcrumb.Item>
-                  <Breadcrumb.Item>视频教程</Breadcrumb.Item>
+                  <Breadcrumb.Item>
+                    {mylist[0].typeId == 1
+                      ? "文章"
+                      : mylist[0].typeId == 2
+                      ? "分享"
+                      : "生活"}
+                  </Breadcrumb.Item>
                 </Breadcrumb>
               </div>
             }
@@ -62,22 +65,31 @@ const MyList = () => {
             dataSource={mylist}
             renderItem={(item) => (
               <List.Item>
-                <div className="list-title">{item.title}</div>
+                <div className="list-title">
+                  <Link
+                    href={{ pathname: "/detailed", query: { id: item.id } }}
+                  >
+                    <a>{item.title}</a>
+                  </Link>
+                </div>
                 <div className="list-icon">
                   <span>
                     <CalendarOutlined />
-                    2019-06-28
+                    {item.addTime}
                   </span>
                   <span>
                     <FolderOpenOutlined />
-                    视频教程
+                    {item.typeName}
                   </span>
                   <span>
                     <FireOutlined />
-                    666
+                    {item.view_count}
                   </span>
                 </div>
-                <div className="list-context">{item.context}</div>
+                <div
+                  className="list-context"
+                  dangerouslySetInnerHTML={{ __html: marked(item.introduce) }}
+                ></div>
               </List.Item>
             )}
           />
@@ -91,5 +103,13 @@ const MyList = () => {
     </div>
   );
 };
-
+MyList.getInitialProps = async (context) => {
+  const id = context.query.id;
+  const promise = new Promise((resolve) => {
+    axios(servicePath.getListById + id).then((res) => {
+      resolve(res.data);
+    });
+  });
+  return await promise;
+};
 export default MyList;
