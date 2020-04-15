@@ -25,6 +25,9 @@
 - yarn add react-markdown
 - import ReactMarkdown from "react-markdown";
 - <ReactMarkdown source={xxxx} escapeHtml={false} />
+- 更换成 marked+highlight.js
+- yarn add marked
+- yarn add highlight.js
 
 ### markdown 导航
 
@@ -36,4 +39,29 @@
 
 # Egg.js 数据获取模块
 
-# 后台管理模块
+### 初始化
+
+```
+$ mkdir egg-example && cd egg-example
+$ npm init egg --type=simple
+$ npm i
+```
+
+    启动项目
+
+```
+    npm run dev
+    open http://localhost:7001
+```
+
+### RESTful 风格
+
+### yarn add egg-mysql
+
+# http://linote.xyz:3000/
+
+# http://linote.xyz/MuYun/html/log.html
+
+```
+
+```
